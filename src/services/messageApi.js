@@ -1,7 +1,7 @@
+const API_URL = import.meta.env.VITE_API_URL;
+
 export async function fetchMessages(conversationId) {
-  const res = await fetch(
-    `http://localhost:5000/api/messages/${conversationId}`
-  );
+  const res = await fetch(`${API_URL}/api/messages/${conversationId}`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch messages");
@@ -11,7 +11,7 @@ export async function fetchMessages(conversationId) {
 }
 
 export async function sendMessage(conversationId, clerkId, content) {
-  const res = await fetch("http://localhost:5000/api/messages", {
+  const res = await fetch(`${API_URL}/api/messages`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

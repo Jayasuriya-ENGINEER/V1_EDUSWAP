@@ -3,6 +3,8 @@ import { useUser } from "@clerk/clerk-react";
 import { supabase } from "../../services/supabaseClient";
 import { fetchMessages, sendMessage } from "../../services/messageApi";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Conversation({ conversation }) {
   const { user } = useUser();
   const [messages, setMessages] = useState([]);
@@ -13,7 +15,7 @@ export default function Conversation({ conversation }) {
 
   /* Check Google connection status */
   useEffect(() => {
-    fetch("http://localhost:5000/api/google/status")
+    fetch(`${API_URL}/api/google/status`)
       .then((res) => res.json())
       .then((data) => setIsGoogleConnected(data.connected))
       .catch(() => setIsGoogleConnected(false));
@@ -26,11 +28,11 @@ export default function Conversation({ conversation }) {
 
   /* Connect to Google */
   function handleConnectGoogle() {
-    window.open("http://localhost:5000/api/google/auth", "_blank");
+    window.open(`${API_URL}/api/google/auth`, "_blank");
 
     // Poll for connection status
     const interval = setInterval(async () => {
-      const res = await fetch("http://localhost:5000/api/google/status");
+      const res = await fetch(`${API_URL}/api/google/status`);
       const data = await res.json();
 
       if (data.connected) {
@@ -49,7 +51,7 @@ export default function Conversation({ conversation }) {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/conversations/${conversation.id}/meet`,
+        `${API_URL}/api/conversations/${conversation.id}/meet`,
         { method: "POST" }
       );
 
@@ -66,10 +68,6 @@ export default function Conversation({ conversation }) {
       console.error(err);
     }
   }
-
-
-
-
 
   /* Load messages */
   useEffect(() => {
@@ -124,8 +122,6 @@ export default function Conversation({ conversation }) {
     await sendMessage(conversation.id, user.id, text);
   }
 
-
-
   async function handleCompleteSession() {
     if (
       !confirm(
@@ -137,7 +133,7 @@ export default function Conversation({ conversation }) {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/conversations/${conversation.id}/complete`,
+        `${API_URL}/api/conversations/${conversation.id}/complete`,
         { method: "POST" }
       );
 
@@ -158,7 +154,6 @@ export default function Conversation({ conversation }) {
 
   return (
     <div className="h-full flex flex-col bg-zinc-50">
-      {/* HEADER */}
       {/* HEADER */}
       <div className="h-14 bg-white border-b px-4 flex items-center justify-between">
         <p className="font-medium text-sm">{conversation.other_user_name}</p>
