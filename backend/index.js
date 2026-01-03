@@ -17,7 +17,29 @@ import messagesRoutes from "./routes/messages.js";
 
 const app = express();
 
-app.use(cors());
+// ✅ Configure CORS properly for production
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  process.env.FRONTEND_URL, // Your Vercel URL
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -30,9 +52,11 @@ app.use("/api/skills", skillsRoutes);
 app.use("/api/mentor-skills", mentorSkillsRoutes);
 app.use("/api/requests", requestsRoutes);
 app.use("/api/google", googleRoutes);
-app.use("/api/conversations", conversationsRoutes); // ✅ Make sure this is here
+app.use("/api/conversations", conversationsRoutes);
 app.use("/api/messages", messagesRoutes);
 
-app.listen(5000, () => {
-  console.log("Backend running on port 5000");
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Backend running on port ${PORT}`);
 });
